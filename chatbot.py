@@ -102,8 +102,8 @@ if 'past' not in st.session_state:
     st.session_state['past'] = ['Hello']
 
 # Initialize current_html_content with the content of the original HTML file
-if 'current_html_content' not in st.session_state:
-    st.session_state['current_html_content'] = read_html_content(file_name)
+# if 'current_html_content' not in st.session_state:
+#     st.session_state['current_html_content'] = read_html_content(file_name)
 a=st.file_uploader(label="上傳")
 # df = pd.read_csv(a)
 # st.dataframe(df)
