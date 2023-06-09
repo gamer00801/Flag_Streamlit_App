@@ -39,7 +39,7 @@ load_dotenv()
 # loader = TextLoader(r"C:\Users\Admin\Downloads\FigmaChain-main\file_name.txt", encoding='utf-8')
 # Initialize the FigmaFileLoader with environment variables
 figma_loader = FigmaFileLoader(
-    access_token='figd_bmO9w-MSoUiNl_xhm4vC3-re_JluPi6CBcLaFPsh',
+    access_token=,
     key='yjWk44v0PERRiNRf43ku15',
 )
 # Create an index and retriever for Figma documents
