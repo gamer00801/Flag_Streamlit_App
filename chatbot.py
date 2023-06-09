@@ -19,7 +19,7 @@ import pandas as pd
 load_dotenv()
 
 # Set the OpenAI API key and dataset path from the environment variables
-os.environ["OPENAI_API_KEY"] = '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'
+os.environ.get["OPENAI_API_KEY"]
 
 # Define the file name of the HTML file to read and the updated file name
 file_name = r"C:\Users\Admin\Desktop\customer service robot\home.html"
