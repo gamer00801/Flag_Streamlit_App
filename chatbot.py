@@ -4,8 +4,6 @@ from langchain.document_loaders import CSVLoader
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.vectorstores import DeepLake
 from langchain.chains import RetrievalQA
-import chardet
-import tempfile
 import streamlit as st
 from dotenv import load_dotenv
 from tempfile import NamedTemporaryFile
