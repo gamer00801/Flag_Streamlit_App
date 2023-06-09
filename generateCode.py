@@ -17,7 +17,7 @@ from dotenv import load_dotenv
 # Load environment variables
 load_dotenv()
 
-os.environ["OPENAI_API_KEY"]='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'
+
 # access_token = os.environ.get('ACCESS_TOKEN')
 # file_id = os.environ.get('FILE_KEY')
 # ids = os.environ.get('NODE_IDS')
