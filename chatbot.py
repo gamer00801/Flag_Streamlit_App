@@ -6,7 +6,7 @@ from langchain.vectorstores import DeepLake
 from langchain.chains import RetrievalQA
 import streamlit as st
 from dotenv import load_dotenv
-from tempfile import NamedTemporaryFile
+# from tempfile import NamedTemporaryFile
 import streamlit.components.v1 as components
 from streamlit_chat import message
 from langchain import LLMChain, PromptTemplate
