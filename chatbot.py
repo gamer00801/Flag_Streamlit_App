@@ -19,20 +19,9 @@ load_dotenv()
 # Set the OpenAI API key and dataset path from the environment variables
 os.environ["OPENAI_API_KEY"] == st.secrets["OPENAI_API_KEY"]
 
-# Define the file name of the HTML file to read and the updated file name
-file_name = r"C:\Users\Admin\Desktop\customer service robot\home.html"
-updated_file_name = "output_updated.html"
-
 st.title('FlagBot')
 
 # Define the chatbot template
-# template = """Assistant is a senior developer. Assistant only writes new code and does not write additional text.
-# Assistant is designed to assist with front-end development incorporating modern design principles such as responsive design.
-# Assistant is constantly learning and improving, and its capabilities are constantly evolving. It is able to process and understand large amounts of code, and can use this knowledge to provide accurate and informative coding updates.
-# Overall, Assistant is a powerful tool that can help with a wide range of design and development tasks.
-# {history}
-# Human: {human_input}
-# Assistant:"""
 template = """請根據上下文來回答問題,盡量針對資料內的重點做回覆,如果你不知道答案，就說你不知道，不要試圖編造答案。
 {context}
 You是專業客服人員,使用繁體中文,對問題會盡力回答,回答問題後會在詢問是否還有什麼問題:
@@ -41,10 +30,6 @@ me:{question}
 """
 
 # Define the chatbot prompt
-# prompt = PromptTemplate(
-#     input_variables=["history", "human_input"], 
-#     template=template
-# )
 prompt = PromptTemplate(
     input_variables=["context", "question"], 
     template=template
@@ -101,37 +86,47 @@ if 'generated' not in st.session_state:
 if 'past' not in st.session_state:
     st.session_state['past'] = ['Hello']
 
-# Initialize current_html_content with the content of the original HTML file
-# if 'current_html_content' not in st.session_state:
-#     st.session_state['current_html_content'] = read_html_content(file_name)
+prompt="""請根據上下文來回答問題,盡量針對資料內的重點做回覆,如果你不知道答案，就說你不知道，不要試圖編造答案。
+{context}
+You是專業客服人員,使用繁體中文,對問題會盡力回答,回答問題後會在詢問是否還有什麼問題:
+:你好我是客服人員
+me:{question}
+"""
+PROMPT = PromptTemplate(
+    template=prompt, input_variables=["context","question"]
+)
 a=st.file_uploader(label="上傳")
-# df = pd.read_csv(a)
-# st.dataframe(df)
-# loader = CSVLoader(a)
-
-embeddings = OpenAIEmbeddings()
+def streamlit_file(a):
+    df = pd.read_csv(a,engine='python',encoding='utf-8')
+    st.dataframe(df)
+    with tempfile.NamedTemporaryFile(delete=False) as tmp_file:
+        tmp_file.write(a.getvalue())
+        tmp_file_path = tmp_file.name
+    loader = CSVLoader(file_path=tmp_file_path,encoding='utf-8')
+    doc=loader.load_and_split()
+    embeddings = OpenAIEmbeddings()
+    dataset_path = '/local_path'
+    db = DeepLake.from_documents(doc, embeddings, dataset_path=dataset_path)
+    retriever = db.as_retriever()
+    retriever.search_kwargs['distance_metric'] = 'cos'
+    retriever.search_kwargs['k'] = 7
+    model = ChatOpenAI(model_name='gpt-3.5-turbo') # 'gpt-3.5-turbo',
+    chain_type_kwargs = {"prompt":PROMPT}
+    qa = RetrievalQA.from_chain_type(model, chain_type="stuff", retriever=retriever, chain_type_kwargs=chain_type_kwargs)
+    return qa
 # Render the initial HTML content
 # display = render_html(read_html_content(file_name))
-
+if a is not None:
+    qa=streamlit_file(a)
 # Get the user's input from the text input field
 user_input = get_text()
 
 # If there is user input, search for a response and update the HTML content
 if user_input:
-    html_content = read_html_content(file_name)
-    output = generate_response(user_input, st.session_state['current_html_content'])
-    if is_valid_html_css_code(output):
-        # Update the chatbot with the new design 
-        st.session_state['current_html_content'] = output
-        # Write the updated HTML content to the file
-        write_html_content(output)
-
-        # Append the user input and generated output to the session state
-        st.session_state.past.append(user_input)
-        st.session_state.generated.append(output)
-
-        # Render the updated HTML content
-        render_html(output)
+    output=qa.run(user_input)
+    # Append the user input and generated output to the session state
+    st.session_state.past.append(user_input)
+    st.session_state.generated.append(output)
 
 # If there are generated responses, display the conversation using Streamlit messages
 if st.session_state['generated']:
