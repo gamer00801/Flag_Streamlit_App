@@ -3,6 +3,7 @@ import re
 from langchain.document_loaders import CSVLoader
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.chains import RetrievalQA
+from langchain.text_splitter import CharacterTextSplitter
 from langchain.indexes import VectorstoreIndexCreator
 import streamlit as st
 from dotenv import load_dotenv
@@ -20,7 +21,7 @@ load_dotenv()
 os.environ["OPENAI_API_KEY"] == st.secrets["OPENAI_API_KEY"]
 
 st.title('FlagBot')
-
+doc=[]
 # Function to get the user's input from the text input field
 def get_text():
     # Create a Streamlit input field and return the user's input
@@ -51,7 +52,9 @@ def streamlit_file(a):
         tmp_file.write(a.getvalue())
         tmp_file_path = tmp_file.name
     loader = CSVLoader(file_path=tmp_file_path,encoding='utf-8')
-    doc=loader.load_and_split()
+    doc.extend(loader.load_and_split())
+    text_splitter=CharacterTextSplitter(chunk_size=1000,chunk_overlap=0)
+    text_splitter.split_documents(doc)
     embeddings = OpenAIEmbeddings()
     index_creator = VectorstoreIndexCreator(embedding=embeddings)
     docsearch = index_creator.from_loaders([loader])
