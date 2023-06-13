@@ -4,4 +4,3 @@ streamlit==1.22.0
 python-dotenv==1.0.0
 streamlit_chat==0.0.2.2
 langchain==0.0.150
-deeplake==3.6.1
